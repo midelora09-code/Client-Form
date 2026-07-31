@@ -1,9 +1,10 @@
-/* ==========================================
+/* ==========================================================================
    CONFIGURATIONS
-====================================== */
+   ========================================================================== */
 const EMAILJS_PUBLIC_KEY = "8-oL03bPAfiCqVtpe";
 const EMAILJS_SERVICE_ID = "service_rm19xwd";
-const EMAILJS_TEMPLATE_ID = "template_scxioh7";
+const EMAILJS_ADMIN_TEMPLATE_ID = "template_scxioh7"; // Aapka notification template
+const EMAILJS_CLIENT_TEMPLATE_ID = "template_sac6ryt"; // Client ke auto-reply template ki ID
 
 const WHATSAPP_OWNER_NUMBER = "919091824475"; 
 
@@ -28,6 +29,7 @@ const toastContainer = document.getElementById("toastContainer");
 
 const fullNameInput = document.getElementById("fullName");
 const phoneInput = document.getElementById("phoneNumber");
+const emailInput = document.getElementById("emailAddress");
 const businessInput = document.getElementById("businessName");
 const addressInput = document.getElementById("address");
 const noteInput = document.getElementById("note");
@@ -97,9 +99,13 @@ function setupCharacterCounters() {
     });
   }
 
-  [fullNameInput, businessInput].forEach(input => {
+  [fullNameInput, emailInput, businessInput].forEach(input => {
     if (input) input.addEventListener("input", validateForm);
   });
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function validateForm() {
@@ -120,6 +126,18 @@ function validateForm() {
     phoneGroup.classList.add("valid");
   }
 
+  // Email Validation
+  const emailVal = emailInput ? emailInput.value.trim() : "";
+  const emailGroup = emailInput ? emailInput.closest(".input-group") : null;
+  if (!emailVal || !isValidEmail(emailVal)) {
+    isValid = false;
+    if (emailGroup && emailVal.length > 0) emailGroup.classList.add("invalid");
+    if (emailGroup) emailGroup.classList.remove("valid");
+  } else if (emailGroup) {
+    emailGroup.classList.remove("invalid");
+    emailGroup.classList.add("valid");
+  }
+
   if (!businessInput || !businessInput.value.trim()) isValid = false;
   if (!addressInput || !addressInput.value.trim()) isValid = false;
 
@@ -128,7 +146,7 @@ function validateForm() {
 }
 
 /* ==========================================================================
-   SUBMISSION LOGIC
+   SUBMISSION LOGIC (UPDATED WITH PROMISE.ALLSETTLED)
    ========================================================================== */
 if (clientForm) {
   clientForm.addEventListener("submit", async (e) => {
@@ -152,6 +170,7 @@ if (clientForm) {
       id: Date.now(),
       name: fullNameInput.value.trim(),
       phone: phoneVal,
+      email: emailInput.value.trim(),
       business: businessInput.value.trim(),
       address: addressInput.value.trim(),
       note: noteInput.value.trim() || "N/A",
@@ -161,23 +180,53 @@ if (clientForm) {
 
     try {
       if (typeof emailjs !== "undefined") {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        
+        // Admin parameters
+        const adminParams = {
           name: formData.name,
           phone: formData.phone,
+          email: formData.email,
           business: formData.business,
           address: formData.address,
           note: formData.note,
           time: formData.createdAt
-        });
+        };
+
+        // Client parameters
+        const clientParams = {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          business: formData.business,
+          address: formData.address
+        };
+
+        // Use Promise.allSettled so one failure doesn't block the other
+        const results = await Promise.allSettled([
+          emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_ADMIN_TEMPLATE_ID, adminParams),
+          emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_CLIENT_TEMPLATE_ID, clientParams)
+        ]);
+
+        const adminSent = results[0].status === "fulfilled";
+        const clientSent = results[1].status === "fulfilled";
+
+        if (adminSent && clientSent) {
+          showToast("Details submit ho gaye aur aap ko received massage bhej diya geya hai!", "success");
+        } else if (adminSent) {
+          showToast("Aapko email mil gaya hai, par client email delivery fail hui.", "info");
+        } else {
+          showToast("Email send karte waqt issue aaya, par data save ho gaya.", "error");
+        }
+      } else {
+        showToast("EmailJS script load nahi hui hai!", "error");
       }
 
       saveClientToStorage(formData);
-      showToast("Details successfully submit ho gaye!", "success");
       renderSuccessView(formData.name);
 
     } catch (error) {
       console.error("Submission error:", error);
-      showToast("Email send karne me error aaya, par data local save hua hai.", "error");
+      showToast("Submission error, data local save kar diya gaya.", "error");
       saveClientToStorage(formData);
       renderSuccessView(formData.name);
     } finally {
@@ -255,6 +304,7 @@ function loadAdminDashboard() {
       const filtered = currentClients.filter(c => 
         c.name.toLowerCase().includes(query) || 
         c.phone.includes(query) ||
+        (c.email && c.email.toLowerCase().includes(query)) ||
         c.business.toLowerCase().includes(query)
       );
       renderAdminTable(filtered);
@@ -319,6 +369,7 @@ function renderAdminTable(data) {
       <td>${client.createdAt}</td>
       <td><strong>${escapeHtml(client.name)}</strong></td>
       <td>${escapeHtml(client.phone)}</td>
+      <td>${escapeHtml(client.email || "N/A")}</td>
       <td>${escapeHtml(client.business)}</td>
       <td>${escapeHtml(client.address)}</td>
       <td>${escapeHtml(client.note)}</td>
@@ -343,9 +394,9 @@ function renderAdminTable(data) {
 /* Helper Utility Functions */
 function exportToCsv(data) {
   if (!data.length) return showToast("Export ke liye koi data nahi hai", "error");
-  const headers = ["ID", "Name", "Phone", "Business", "Address", "Note", "Submitted At"];
+  const headers = ["ID", "Name", "Phone", "Email", "Business", "Address", "Note", "Submitted At"];
   const escapeCsv = (str) => `"${String(str).replace(/"/g, '""')}"`;
-  const rows = data.map(c => [c.id, escapeCsv(c.name), escapeCsv(c.phone), escapeCsv(c.business), escapeCsv(c.address), escapeCsv(c.note), escapeCsv(c.createdAt)]);
+  const rows = data.map(c => [c.id, escapeCsv(c.name), escapeCsv(c.phone), escapeCsv(c.email || "N/A"), escapeCsv(c.business), escapeCsv(c.address), escapeCsv(c.note), escapeCsv(c.createdAt)]);
   const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
   downloadFile(encodeURI(csvContent), `clients_${Date.now()}.csv`);
 }
@@ -368,7 +419,7 @@ function downloadFile(content, fileName) {
 window.copyClientData = function (id) {
   const client = getStoredClients().find(c => c.id === id);
   if (!client) return;
-  const text = `Name: ${client.name}\nPhone: ${client.phone}\nBusiness: ${client.business}\nAddress: ${client.address}\nNote: ${client.note}`;
+  const text = `Name: ${client.name}\nPhone: ${client.phone}\nEmail: ${client.email || "N/A"}\nBusiness: ${client.business}\nAddress: ${client.address}\nNote: ${client.note}`;
   navigator.clipboard.writeText(text).then(() => showToast("Client details copy ho gaye!", "success"));
 };
 
