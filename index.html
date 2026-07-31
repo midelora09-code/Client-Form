@@ -55,7 +55,7 @@
       <form id="clientForm" novalidate>
         <!-- Header is now inside clientForm so it hides on submit -->
         <div class="form-header">
-          <div class="header-tag"><i class="fa-solid fa-sparkles"></i> Fast Onboarding</div>
+          <div class="header-tag"><i class="fa-solid fa-sparkles"></i>Minu Promotion</div>
           <h2>Client Details Form</h2>
           <p>Kripya apni details fill karein. Aapka data instant process ho jayega.</p>
         </div>
@@ -80,6 +80,17 @@
             <span class="val-icon"><i class="fa-solid fa-circle-check"></i></span>
           </div>
           <span class="error-msg" id="phoneError">Sahi 10-digit mobile number enter karein</span>
+        </div>
+
+        <!-- Gmail / Email Address (NEW) -->
+        <div class="input-group">
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope field-icon"></i>
+            <input type="email" id="emailAddress" required placeholder=" " autocomplete="email">
+            <label for="emailAddress">Gmail / Email Address *</label>
+            <span class="val-icon"><i class="fa-solid fa-circle-check"></i></span>
+          </div>
+          <span class="error-msg" id="emailError">Valid Email Address enter karein</span>
         </div>
 
         <!-- Business Name -->
@@ -193,7 +204,7 @@
       <div class="controls-bar">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="text" id="searchInput" placeholder="Search by Name, Phone, or Business...">
+          <input type="text" id="searchInput" placeholder="Search by Name, Phone, Email, or Business...">
           <button id="clearSearch" class="clear-btn hidden"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <button id="clearAllBtn" class="btn btn-danger btn-sm">
@@ -209,6 +220,7 @@
               <th>Date & Time</th>
               <th>Client Name</th>
               <th>Phone</th>
+              <th>Email</th>
               <th>Business Name</th>
               <th>Address</th>
               <th>Note</th>
