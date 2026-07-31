@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Form</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Effect -->
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-badge">
+          <i class="fa-solid fa-user logo-icon"></i>
+        </div>
+        <div class="logo-text">
+          <span>Client Form</span>
+        </div>
+      </div>
+      
+      <!-- Help Button -->
+      <a href="help.html" class="btn-help">
+        <i class="fa-solid fa-circle-question"></i>Help
+      </a>
+    </div>
+  </header>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <main class="container">
+    
+    <!-- Client Form View -->
+    <section id="formSection" class="card-glass">
+      <div class="form-header">
+        <div class="header-tag"><i class="fa-solid fa-sparkles"></i> Fast Onboarding</div>
+        <h2>Client Details Form</h2>
+        <p>Kripya apni details fill karein. Aapka data instant process ho jayega.</p>
+      </div>
+
+      <form id="clientForm" novalidate>
+        
+        <!-- Full Name -->
+        <div class="input-group">
+          <div class="input-wrapper">
+            <i class="fa-regular fa-user field-icon"></i>
+            <input type="text" id="fullName" required placeholder=" " autocomplete="name">
+            <label for="fullName">Full Name *</label>
+            <span class="val-icon"><i class="fa-solid fa-circle-check"></i></span>
+          </div>
+          <span class="error-msg" id="nameError">Full Name enter karna zaroori hai</span>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="input-group">
+          <div class="input-wrapper">
+            <i class="fa-solid fa-phone field-icon"></i>
+            <input type="tel" id="phoneNumber" maxlength="10" required placeholder=" " inputmode="numeric" autocomplete="tel">
+            <label for="phoneNumber">Phone Number (10 Digits) *</label>
+            <span class="val-icon"><i class="fa-solid fa-circle-check"></i></span>
+          </div>
+          <span class="error-msg" id="phoneError">Sahi 10-digit mobile number enter karein</span>
+        </div>
+
+        <!-- Business Name -->
+        <div class="input-group">
+          <div class="input-wrapper">
+            <i class="fa-solid fa-store field-icon"></i>
+            <input type="text" id="businessName" required placeholder=" " autocomplete="organization">
+            <label for="businessName">Store / Business / Brand Name *</label>
+            <span class="val-icon"><i class="fa-solid fa-circle-check"></i></span>
+          </div>
+          <span class="error-msg" id="businessError">Business Name enter karna zaroori hai</span>
+        </div>
+
+        <!-- Address -->
+        <div class="input-group">
+          <div class="input-wrapper textarea-wrapper">
+            <i class="fa-solid fa-location-dot field-icon"></i>
+            <textarea id="address" rows="3" required placeholder=" " maxlength="250"></textarea>
+            <label for="address">Full Address with pincode*</label>
+          </div>
+          <div class="field-footer">
+            <span class="error-msg" id="addressError">Address enter karna zaroori hai</span>
+            <span class="char-count"><span id="addressCount">0</span>/250</span>
+          </div>
+        </div>
+
+        <!-- Note (Optional) -->
+        <div class="input-group">
+          <div class="input-wrapper textarea-wrapper">
+            <i class="fa-regular fa-note-sticky field-icon"></i>
+            <textarea id="note" rows="2" placeholder=" " maxlength="200"></textarea>
+            <label for="note">Additional Note (Optional)</label>
+          </div>
+          <div class="field-footer right-only">
+            <span class="char-count"><span id="noteCount">0</span>/200</span>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitBtn" class="btn btn-primary" disabled>
+          <span class="btn-text">Submit Details <i class="fa-solid fa-arrow-right btn-arrow"></i></span>
+          <span class="spinner hidden"></span>
+        </button>
+
+      </form>
+
+      <!-- Success Card -->
+      <div id="successCard" class="success-card hidden">
+        <div class="success-animation">
+          <div class="checkmark-circle">
+            <i class="fa-solid fa-check"></i>
+          </div>
+        </div>
+        <h3>Details Successfully Received!</h3>
+        <p>Shukriya! Aapka details system me save ho chuka hai. Direct discussion ke liye niche button par click karein.</p>
+        
+        <a id="whatsappBtn" href="#" target="_blank" class="btn btn-whatsapp">
+          <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp Now
+        </a>
+
+        <button id="resetFormBtn" class="btn-link">
+          <i class="fa-solid fa-rotate-right"></i> Submit Another Form
+        </button>
+      </div>
+    </section>
+
+    <!-- Admin Dashboard View (?admin=true) -->
+    <section id="adminSection" class="card-glass admin-card hidden">
+      <div class="admin-header">
+        <div>
+          <div class="header-tag admin-tag"><i class="fa-solid fa-user-shield"></i> Owner Access</div>
+          <h2>Admin Command Center</h2>
+          <p class="subtitle">Manage and track all real-time client submissions</p>
+        </div>
+        <div class="admin-actions">
+          <button id="exportCsvBtn" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-file-csv"></i> Export CSV
+          </button>
+          <button id="exportJsonBtn" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-code"></i> Export JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Total Clients</span>
+            <h3 id="statTotal">0</h3>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon accent"><i class="fa-solid fa-calendar-day"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Submitted Today</span>
+            <h3 id="statToday">0</h3>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fa-solid fa-building"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Unique Businesses</span>
+            <h3 id="statBusinesses">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-bar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="searchInput" placeholder="Search by Name, Phone, or Business...">
+          <button id="clearSearch" class="clear-btn hidden"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <button id="clearAllBtn" class="btn btn-danger btn-sm">
+          <i class="fa-solid fa-trash-can"></i> Clear All Data
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Client Name</th>
+              <th>Phone</th>
+              <th>Business Name</th>
+              <th>Address</th>
+              <th>Note</th>
+              <th>Quick Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clientTableBody"></tbody>
+        </table>
+      </div>
+
+      <div id="noDataMsg" class="no-data hidden">
+        <i class="fa-solid fa-inbox"></i>
+        <p>Koi client record nahi mila.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
