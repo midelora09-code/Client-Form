@@ -137,7 +137,7 @@ body {
   color: #ffffff;
 }
 
-/* Toast System (Fixed extra space overflow) */
+/* Toast System */
 .toast-container {
   position: fixed;
   top: 1.25rem;
@@ -348,7 +348,7 @@ body {
   font-weight: 600;
 }
 
-/* Buttons (Fixed Submit Click Layout Shift) */
+/* Buttons */
 .btn {
   width: 100%;
   min-height: 52px;
@@ -583,10 +583,7 @@ body {
   .controls-bar { flex-direction: column; }
 }
 
-
-/* =================================
-   HELP PAGE SPECIFIC STYLES
-   ================================ */
+/* Help Page Specific Styles */
 .help-steps {
   display: flex;
   flex-direction: column;
