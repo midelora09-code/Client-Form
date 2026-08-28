@@ -4,7 +4,6 @@
 const EMAILJS_PUBLIC_KEY = "8-oL03bPAfiCqVtpe";
 const EMAILJS_SERVICE_ID = "service_rm19xwd";
 const EMAILJS_ADMIN_TEMPLATE_ID = "template_scxioh7"; // Aapka notification template
-const EMAILJS_CLIENT_TEMPLATE_ID = "template_sac6ryt"; // Client ke auto-reply template ki ID
 
 const WHATSAPP_OWNER_NUMBER = "919091824475"; 
 
